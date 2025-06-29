@@ -2,7 +2,6 @@ package com.example.board.model;
 
 import java.time.ZonedDateTime;
 
-
 public class Post {
     private Long postId;
     private String body;

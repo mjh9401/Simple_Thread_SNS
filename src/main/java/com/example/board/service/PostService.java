@@ -5,9 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.board.model.Post;
+import com.example.board.model.PostPatchRequestBody;
 import com.example.board.model.PostPostRequestBody;
 
 @Service
@@ -30,12 +33,25 @@ public class PostService {
     }
 
     public Post createPost(PostPostRequestBody postPostRequestBody) {
-        Long postId = posts.stream().mapToLong(Post::getPostId).max().orElse(0L)+1;
+        var postId = posts.stream().mapToLong(Post::getPostId).max().orElse(0L)+1;
 
-        Post newPost = new Post(postId, postPostRequestBody.body(), ZonedDateTime.now());
+        var newPost = new Post(postId, postPostRequestBody.body(), ZonedDateTime.now());
         posts.add(newPost);
 
         return newPost;
+    }
+
+    public Post updatePost(PostPatchRequestBody postPatchRequestBody, Long postId) {
+       Optional<Post> postOptional = posts.stream().filter(post -> postId.equals(post.getPostId())).findFirst();
+
+       if(postOptional.isPresent()){
+        Post postToUpdate = postOptional.get();
+        postToUpdate.setBody(postPatchRequestBody.body());
+
+        return postToUpdate; 
+       }else{
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Post not found.");
+       }
     }   
 
 
