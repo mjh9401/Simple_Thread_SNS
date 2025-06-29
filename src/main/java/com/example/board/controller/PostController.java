@@ -1,39 +1,38 @@
 package com.example.board.controller;
 
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.board.model.Post;
+import com.example.board.model.PostPostRequestBody;
+import com.example.board.service.PostService;
 
 @RestController
+@RequestMapping("/api/v1/posts")
 public class PostController {
-    
-    @GetMapping("/api/v1/posts")
-    public ResponseEntity<List<Post>> getPosts(){
-        List<Post> posts = new ArrayList<>();
-        posts.add(new Post(1L, "Post 1", ZonedDateTime.now()));
-        posts.add(new Post(2L, "Post 2", ZonedDateTime.now()));
-        posts.add(new Post(3L, "Post 3", ZonedDateTime.now()));
 
-        return new ResponseEntity<>(posts,HttpStatus.OK);
+    @Autowired
+    private PostService postService;
+    
+    @GetMapping
+    public ResponseEntity<List<Post>> getPosts(){
+        List<Post> posts = postService.getPosts();
+
+        return ResponseEntity.ok(posts);
     }
 
-    @GetMapping("/api/v1/posts/{postId}")
-    public ResponseEntity<Post> getPost(@PathVariable("postId") Long postId){
-        List<Post> posts = new ArrayList<>();
-        posts.add(new Post(1L, "Post 1", ZonedDateTime.now()));
-        posts.add(new Post(2L, "Post 2", ZonedDateTime.now()));
-        posts.add(new Post(3L, "Post 3", ZonedDateTime.now()));
-
-        Optional<Post> machingPost = posts.stream().filter(post -> postId.equals(post.getPostId())).findFirst();
+    @GetMapping("/{postId}")
+    public ResponseEntity<Post> getPostByPostId(@PathVariable("postId") Long postId){
+        Optional<Post> machingPost = postService.getPostByPostId(postId);
 
         return machingPost
             .map(post -> ResponseEntity.ok(post))
@@ -42,4 +41,10 @@ public class PostController {
     }
 
     
+    @PostMapping
+    public ResponseEntity<Post> createPost(@RequestBody PostPostRequestBody postPostRequestBody){
+        var post = postService.createPost(postPostRequestBody);
+
+        return ResponseEntity.ok(post);     
+    }
 }
