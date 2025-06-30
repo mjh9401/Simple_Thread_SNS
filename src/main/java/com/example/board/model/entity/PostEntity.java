@@ -2,15 +2,24 @@ package com.example.board.model.entity;
 
 import java.time.ZonedDateTime;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "post")
+@SQLDelete(sql = "UPDATE \"post\" SET deletedatetime = CURRENT_TIMESTAMP WHERE postid = ?")
+// Deprecated in Hibernate 6.3
+// @Where(clause = "deletedDateTime IS NULL")
+@SQLRestriction("deletedatetime IS NULL")
 public class PostEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -117,5 +126,15 @@ public class PostEntity {
         return true;
     }
 
+    @PrePersist
+    private void prePersist(){
+        this.createdDateTime = ZonedDateTime.now();
+        this.updateDateTime = this.createdDateTime;
+    }
+
+    @PreUpdate
+    private void preUpdate(){
+        this.updateDateTime = ZonedDateTime.now();
+    }
     
 }

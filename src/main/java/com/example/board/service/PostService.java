@@ -1,9 +1,6 @@
 package com.example.board.service;
 
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.board.model.Post;
 import com.example.board.model.PostPatchRequestBody;
 import com.example.board.model.PostPostRequestBody;
+import com.example.board.model.entity.PostEntity;
 import com.example.board.repository.PostEntityRepository;
 
 @Service
@@ -36,35 +34,27 @@ public class PostService {
     }
 
     public Post createPost(PostPostRequestBody postPostRequestBody) {
-        var postId = posts.stream().mapToLong(Post::getPostId).max().orElse(0L)+1;
+        var postEntity = new PostEntity();
+        postEntity.setBody(postPostRequestBody.body());
+        var savedPostEntity = postEntityRepository.save(postEntity);
 
-        var newPost = new Post(postId, postPostRequestBody.body(), ZonedDateTime.now());
-        posts.add(newPost);
-
-        return newPost;
+        return Post.from(savedPostEntity);
     }
 
     public Post updatePost(PostPatchRequestBody postPatchRequestBody, Long postId) {
-       Optional<Post> postOptional = posts.stream().filter(post -> postId.equals(post.getPostId())).findFirst();
+        var postEntity = postEntityRepository.findById(postId)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found."));
+        postEntity.setBody(postPatchRequestBody.body());
+        var updatedPostEntity = postEntityRepository.save(postEntity);
 
-       if(postOptional.isPresent()){
-        Post postToUpdate = postOptional.get();
-        postToUpdate.setBody(postPatchRequestBody.body());
-
-        return postToUpdate; 
-       }else{
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Post not found.");
-       }
+        return Post.from(updatedPostEntity);
     }
 
     public void deletePost(Long postId) {
-        Optional<Post> postOptional = posts.stream().filter(post -> postId.equals(post.getPostId())).findFirst();
 
-       if(postOptional.isPresent()){
-        posts.remove(postOptional.get());
-       }else{
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Post not found.");
-       }
+        var postEntity = postEntityRepository.findById(postId)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found."));
+        postEntityRepository.delete(postEntity);
     }   
 
 
