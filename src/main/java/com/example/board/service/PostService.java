@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -12,24 +13,26 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.board.model.Post;
 import com.example.board.model.PostPatchRequestBody;
 import com.example.board.model.PostPostRequestBody;
+import com.example.board.repository.PostEntityRepository;
 
 @Service
 public class PostService {
 
-    private static final List<Post> posts = new ArrayList<>();
+    @Autowired
+    private PostEntityRepository postEntityRepository;
 
-    static{
-        posts.add(new Post(2L, "Post 2", ZonedDateTime.now()));
-        posts.add(new Post(3L, "Post 3", ZonedDateTime.now()));
-        posts.add(new Post(1L, "Post 1", ZonedDateTime.now()));
-    }
 
     public List<Post> getPosts(){
-        return posts;
+        var postEntities = postEntityRepository.findAll();
+        
+        return postEntities.stream().map(Post::from).toList();
     }
 
-    public Optional<Post> getPostByPostId(Long postId){
-        return posts.stream().filter(post -> postId.equals(post.getPostId())).findFirst();
+    public Post getPostByPostId(Long postId){
+        var postEntity = postEntityRepository.findById(postId)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found."));
+
+        return Post.from(postEntity);
     }
 
     public Post createPost(PostPostRequestBody postPostRequestBody) {

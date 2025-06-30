@@ -1,7 +1,6 @@
 package com.example.board.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,12 +34,9 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public ResponseEntity<Post> getPostByPostId(@PathVariable("postId") Long postId){
-        Optional<Post> machingPost = postService.getPostByPostId(postId);
+        Post machingPost = postService.getPostByPostId(postId);
 
-        return machingPost
-            .map(post -> ResponseEntity.ok(post))
-            .orElseGet(()-> ResponseEntity.notFound().build());
-            
+        return ResponseEntity.ok(machingPost);
     }
 
     

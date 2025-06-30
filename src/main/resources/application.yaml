@@ -1,0 +1,21 @@
+server:
+  port: 9090
+
+spring:
+  jpa:
+    database: postgresql
+    show-sql: true
+    hibernate:
+      # ddl-auto는 실제 서비스 환경에는 사용하지 않는 옵션    
+      ddl-auto: create-drop 
+      format_sql: true
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: jdbc:postgresql://localhost:5432/board-db
+    username: shane
+    password: java
+
+
