@@ -19,7 +19,6 @@ public class PostService {
     @Autowired
     private PostEntityRepository postEntityRepository;
 
-
     public List<Post> getPosts(){
         var postEntities = postEntityRepository.findAll();
         

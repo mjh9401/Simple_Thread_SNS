@@ -17,5 +17,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/board_db
     username: shane
     password: java
+  security:
+    user:
+      name: board-admin
+      password: board-admin-password
+
 
 
