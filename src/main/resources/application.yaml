@@ -24,7 +24,7 @@ spring:
 logging:
   level:
     # trace < debug < info < warn < error
-    root: ERROR
+    root: INFO
 
 #logging:
 #  level:
