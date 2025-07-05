@@ -87,8 +87,8 @@ public class UserEntity implements UserDetails{
         return updatedDatetime;
     }
 
-    public ZonedDateTime getDeletedDatetime() {
-        return deletedDatetime;
+   public ZonedDateTime getDeleteddatetime() {
+        return deleteddatetime;
     }
 
     public void setUserId(Long userId) {
@@ -119,8 +119,32 @@ public class UserEntity implements UserDetails{
         this.updatedDatetime = updatedDatetime;
     }
 
-    public void setDeletedDatetime(ZonedDateTime deletedDatetime) {
-        this.deletedDatetime = deletedDatetime;
+    public void setDeleteddatetime(ZonedDateTime deleteddatetime) {
+        this.deleteddatetime = deleteddatetime;
+    }
+
+    
+
+    public static UserEntity of(String username, String password){
+        var userEntity = new UserEntity();
+        userEntity.setUsername(username);
+        userEntity.setPassword(password);
+
+        // Set random profile image url
+        userEntity.setProfile("https://avatar.iran.liara.run/public/" + new Random().nextInt(100));
+      
+        return userEntity;
+    }
+
+    @PrePersist
+    private void prePersist(){
+        this.createdDatetime = ZonedDateTime.now();
+        this.updatedDatetime = this.createdDatetime;
+    }
+
+    @PreUpdate
+    private void preUpdate(){
+        this.updatedDatetime = ZonedDateTime.now();
     }
 
     @Override
@@ -134,7 +158,7 @@ public class UserEntity implements UserDetails{
         result = prime * result + ((description == null) ? 0 : description.hashCode());
         result = prime * result + ((createdDatetime == null) ? 0 : createdDatetime.hashCode());
         result = prime * result + ((updatedDatetime == null) ? 0 : updatedDatetime.hashCode());
-        result = prime * result + ((deletedDatetime == null) ? 0 : deletedDatetime.hashCode());
+        result = prime * result + ((deleteddatetime == null) ? 0 : deleteddatetime.hashCode());
         return result;
     }
 
@@ -182,33 +206,15 @@ public class UserEntity implements UserDetails{
                 return false;
         } else if (!updatedDatetime.equals(other.updatedDatetime))
             return false;
-        if (deletedDatetime == null) {
-            if (other.deletedDatetime != null)
+        if (deleteddatetime == null) {
+            if (other.deleteddatetime != null)
                 return false;
-        } else if (!deletedDatetime.equals(other.deletedDatetime))
+        } else if (!deleteddatetime.equals(other.deleteddatetime))
             return false;
         return true;
     }
 
-    public static UserEntity of(String username, String password){
-        var userEntity = new UserEntity();
-        userEntity.setUsername(username);
-        userEntity.setPassword(password);
+   
 
-        // Set random profile image url
-        userEntity.setProfile("https://avatar.iran.liara.run/public/" + new Random().nextInt(100));
-      
-        return userEntity;
-    }
-
-    @PrePersist
-    private void prePersist(){
-        this.createdDatetime = ZonedDateTime.now();
-        this.updatedDatetime = this.createdDatetime;
-    }
-
-    @PreUpdate
-    private void preUpdate(){
-        this.updatedDatetime = ZonedDateTime.now();
-    }
+    
 }
