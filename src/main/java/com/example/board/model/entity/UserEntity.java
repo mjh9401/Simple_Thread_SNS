@@ -20,10 +20,10 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "\"user\"")
-@SQLDelete(sql = "UPDATE \"user\" SET deletedatetime = CURRENT_TIMESTAMP WHERE userid = ?")
+@SQLDelete(sql = "UPDATE \"user\" SET deleteddatetime = CURRENT_TIMESTAMP WHERE userid = ?")
 // Deprecated in Hibernate 6.3
 // @Where(clause = "deletedDateTime IS NULL")
-@SQLRestriction("deletedatetime IS NULL")
+@SQLRestriction("deleteddatetime IS NULL")
 public class UserEntity implements UserDetails{
 
     @Id
@@ -49,7 +49,7 @@ public class UserEntity implements UserDetails{
     private ZonedDateTime updatedDatetime;
 
     @Column
-    private ZonedDateTime deletedDatetime;
+    private ZonedDateTime deleteddatetime;
 
 
     @Override
