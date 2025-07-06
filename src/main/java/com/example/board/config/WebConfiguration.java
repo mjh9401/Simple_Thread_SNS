@@ -53,7 +53,7 @@ public class WebConfiguration {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults())
             .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/api/v1/users/**").permitAll()
+                .requestMatchers("/api/v1/users","/api/v1/users/authenticate").permitAll()
                 .anyRequest().authenticated())
             .sessionManagement(
                 (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

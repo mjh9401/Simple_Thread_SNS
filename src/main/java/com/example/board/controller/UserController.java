@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.board.model.user.User;
+import com.example.board.model.user.UserAuthenticationResponse;
+import com.example.board.model.user.UserLoginRequestBody;
 import com.example.board.model.user.UserSignUpRequestBody;
 import com.example.board.service.UserService;
 
@@ -32,5 +34,14 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
     
+    @PostMapping("/authenticate")
+    public ResponseEntity<UserAuthenticationResponse> authenticate(@Valid @RequestBody UserLoginRequestBody userLoginRequestBody){
+        var reponse = userService.authenticate(
+            userLoginRequestBody.username(),
+            userLoginRequestBody.password()
+        );
+
+        return ResponseEntity.ok(reponse);
+    }
 
 }
