@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.board.model.Post;
-import com.example.board.model.PostPatchRequestBody;
-import com.example.board.model.PostPostRequestBody;
+import com.example.board.model.post.Post;
+import com.example.board.model.post.PostPatchRequestBody;
+import com.example.board.model.post.PostPostRequestBody;
 import com.example.board.service.PostService;
 
 @RestController

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.example.board.exception.jwt.JwtTokenNotFoundExcpetion;
 import com.example.board.service.JwtService;
 import com.example.board.service.UserService;
 
