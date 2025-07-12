@@ -10,12 +10,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "post")
+@Table(name = "post", indexes = {@Index(name= "post_userid_idx", columnList = "userid")})
 @SQLDelete(sql = "UPDATE \"post\" SET deletedatetime = CURRENT_TIMESTAMP WHERE postid = ?")
 // Deprecated in Hibernate 6.3
 // @Where(clause = "deletedDateTime IS NULL")
@@ -37,6 +40,10 @@ public class PostEntity {
     @Column
     private ZonedDateTime deleteDateTime;
 
+    @ManyToOne
+    @JoinColumn(name = "userid")
+    private UserEntity user;
+
     public Long getPostId() {
         return postId;
     }
@@ -57,6 +64,9 @@ public class PostEntity {
         return deleteDateTime;
     }
 
+     public UserEntity getUser() {
+        return user;
+    }
     public void setPostId(Long postId) {
         this.postId = postId;
     }
@@ -77,6 +87,30 @@ public class PostEntity {
         this.deleteDateTime = deleteDateTime;
     }
 
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+
+    @PrePersist
+    private void prePersist(){
+        this.createdDateTime = ZonedDateTime.now();
+        this.updateDateTime = this.createdDateTime;
+    }
+
+    @PreUpdate
+    private void preUpdate(){
+        this.updateDateTime = ZonedDateTime.now();
+    }
+
+    public static PostEntity of(String body, UserEntity user){
+        var post = new PostEntity();
+        post.setBody(body);
+        post.setUser(user);
+        
+        return post;
+    }
+
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -86,6 +120,7 @@ public class PostEntity {
         result = prime * result + ((createdDateTime == null) ? 0 : createdDateTime.hashCode());
         result = prime * result + ((updateDateTime == null) ? 0 : updateDateTime.hashCode());
         result = prime * result + ((deleteDateTime == null) ? 0 : deleteDateTime.hashCode());
+        result = prime * result + ((user == null) ? 0 : user.hashCode());
         return result;
     }
 
@@ -123,18 +158,16 @@ public class PostEntity {
                 return false;
         } else if (!deleteDateTime.equals(other.deleteDateTime))
             return false;
+        if (user == null) {
+            if (other.user != null)
+                return false;
+        } else if (!user.equals(other.user))
+            return false;
         return true;
     }
 
-    @PrePersist
-    private void prePersist(){
-        this.createdDateTime = ZonedDateTime.now();
-        this.updateDateTime = this.createdDateTime;
-    }
+   
 
-    @PreUpdate
-    private void preUpdate(){
-        this.updateDateTime = ZonedDateTime.now();
-    }
+
     
 }

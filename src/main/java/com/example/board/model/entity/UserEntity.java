@@ -14,12 +14,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "\"user\"")
+@Table(name = "\"user\"", indexes = {@Index(name="user_username_idx", columnList ="username", unique = true)})
 @SQLDelete(sql = "UPDATE \"user\" SET deleteddatetime = CURRENT_TIMESTAMP WHERE userid = ?")
 // Deprecated in Hibernate 6.3
 // @Where(clause = "deletedDateTime IS NULL")

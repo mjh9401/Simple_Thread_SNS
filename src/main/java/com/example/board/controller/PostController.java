@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.board.model.entity.UserEntity;
 import com.example.board.model.post.Post;
 import com.example.board.model.post.PostPatchRequestBody;
 import com.example.board.model.post.PostPostRequestBody;
@@ -45,22 +47,22 @@ public class PostController {
 
     
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody PostPostRequestBody postPostRequestBody){
-        var post = postService.createPost(postPostRequestBody);
+    public ResponseEntity<Post> createPost(@RequestBody PostPostRequestBody postPostRequestBody, Authentication authentication){
+        var post = postService.createPost(postPostRequestBody, (UserEntity) authentication.getPrincipal());
 
         return ResponseEntity.ok(post);     
     }
 
     @PatchMapping("/{postId}")
-    public ResponseEntity<Post> updatePost(@PathVariable("postId") Long postId, @RequestBody PostPatchRequestBody postPatchRequestBody){
-        var post = postService.updatePost(postPatchRequestBody,postId);
+    public ResponseEntity<Post> updatePost(@PathVariable("postId") Long postId, @RequestBody PostPatchRequestBody postPatchRequestBody, Authentication authentication){
+        var post = postService.updatePost(postPatchRequestBody,postId,(UserEntity)authentication.getPrincipal());
 
         return ResponseEntity.ok(post); 
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable("postId") Long postId){
-        postService.deletePost(postId);
+    public ResponseEntity<Void> deletePost(@PathVariable("postId") Long postId, Authentication authentication){
+        postService.deletePost(postId, (UserEntity) authentication.getPrincipal());
 
         return ResponseEntity.noContent().build(); 
     }
