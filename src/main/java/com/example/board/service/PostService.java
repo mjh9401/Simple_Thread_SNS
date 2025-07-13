@@ -7,18 +7,23 @@ import org.springframework.stereotype.Service;
 
 import com.example.board.exception.post.PostNotFoundException;
 import com.example.board.exception.user.UserNotAllowedException;
+import com.example.board.exception.user.UserNotFoundException;
 import com.example.board.model.entity.PostEntity;
 import com.example.board.model.entity.UserEntity;
 import com.example.board.model.post.Post;
 import com.example.board.model.post.PostPatchRequestBody;
 import com.example.board.model.post.PostPostRequestBody;
 import com.example.board.repository.PostEntityRepository;
+import com.example.board.repository.UserEntityRepository;
 
 @Service
 public class PostService {
 
     @Autowired
     private PostEntityRepository postEntityRepository;
+    @Autowired
+    private UserEntityRepository userEntityRepository;
+
 
     public List<Post> getPosts(){
         var postEntities = postEntityRepository.findAll();
@@ -62,6 +67,14 @@ public class PostService {
         }
     
         postEntityRepository.delete(postEntity);
+    }
+
+    public List<Post> getPostByUsername(String username) {
+        var userEntity = userEntityRepository.findByUsername(username)
+                            .orElseThrow(()-> new UserNotFoundException(username));
+        var postEntities= postEntityRepository.findByUser(userEntity);
+    
+        return postEntities.stream().map(Post::from).toList();
     }   
 
 

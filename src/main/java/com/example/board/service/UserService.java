@@ -1,5 +1,7 @@
 package com.example.board.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -8,10 +10,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.board.exception.user.UserAlreadyExistsException;
+import com.example.board.exception.user.UserNotAllowedException;
 import com.example.board.exception.user.UserNotFoundException;
 import com.example.board.model.entity.UserEntity;
 import com.example.board.model.user.User;
 import com.example.board.model.user.UserAuthenticationResponse;
+import com.example.board.model.user.UserPatchRequestBody;
 import com.example.board.repository.UserEntityRepository;
 
 @Service
@@ -55,6 +59,41 @@ public class UserService implements UserDetailsService{
         }else{
             throw new UserNotFoundException();
         }
+    }
+
+    public List<User> getUsers(String query) {
+
+        List<UserEntity> userEntities;
+        
+       if(query != null && !query.isBlank()){
+            userEntities = userEntityRepository.findByUsernameContaining(query);
+        }else{
+            userEntities = userEntityRepository.findAll();
+        }
+
+        return userEntities.stream().map(User::from).toList();
+
+    }
+
+    public User getUser(String username) {
+        var userEntity = userEntityRepository.findByUsername(username)
+                        .orElseThrow(()-> new UserNotFoundException(username));  
+
+        return User.from(userEntity);
+    }
+
+    public User updateUser(String username, UserPatchRequestBody userPatchRequestBody, UserEntity currentUser) {
+        var userEntity = userEntityRepository.findByUsername(username)
+                        .orElseThrow(()-> new UserNotFoundException(username));
+        if(!userEntity.equals(currentUser)){
+            throw new UserNotAllowedException();
+        }
+
+        if(userPatchRequestBody.description() != null){
+            userEntity.setDescription(userPatchRequestBody.description());
+        }
+        
+        return User.from(userEntityRepository.save(userEntity));
     }
 
 }
