@@ -18,22 +18,19 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "post", indexes = {@Index(name= "post_userid_idx", columnList = "userid")})
-@SQLDelete(sql = "UPDATE \"post\" SET deletedatetime = CURRENT_TIMESTAMP WHERE postid = ?")
+@Table(name = "reply", indexes = {@Index(name= "reply_userid_idx", columnList = "userid"), @Index(name= "reply_postid_idx", columnList = "postid")})
+@SQLDelete(sql = "UPDATE \"reply\" SET deletedatetime = CURRENT_TIMESTAMP WHERE replyid = ?")
 // Deprecated in Hibernate 6.3
 // @Where(clause = "deletedDateTime IS NULL")
 @SQLRestriction("deletedatetime IS NULL")
-public class PostEntity {
+public class ReplyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long postId;
+    private Long replyId;
     
     @Column(columnDefinition = "TEXT")
     private String body;
     
-    @Column
-    private Long repliesCount = 0L;
-
     @Column
     private ZonedDateTime createdDateTime;
     
@@ -47,59 +44,64 @@ public class PostEntity {
     @JoinColumn(name = "userid")
     private UserEntity user;
 
-    public Long getPostId() {
-        return postId;
+    @ManyToOne
+    @JoinColumn(name = "postid")
+    private PostEntity post;
+
+    public Long getReplyId() {
+        return replyId;
+    }
+
+    public void setReplyId(Long replyId) {
+        this.replyId = replyId;
     }
 
     public String getBody() {
         return body;
     }
 
-    public ZonedDateTime getCreatedDateTime() {
-        return createdDateTime;
-    }
-
-    public ZonedDateTime getUpdateDateTime() {
-        return updateDateTime;
-    }
-
-    public ZonedDateTime getDeleteDateTime() {
-        return deleteDateTime;
-    }
-
-     public UserEntity getUser() {
-        return user;
-    }
-    public void setPostId(Long postId) {
-        this.postId = postId;
-    }
-
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public ZonedDateTime getCreatedDateTime() {
+        return createdDateTime;
     }
 
     public void setCreatedDateTime(ZonedDateTime createdDateTime) {
         this.createdDateTime = createdDateTime;
     }
 
+    public ZonedDateTime getUpdateDateTime() {
+        return updateDateTime;
+    }
+
     public void setUpdateDateTime(ZonedDateTime updateDateTime) {
         this.updateDateTime = updateDateTime;
+    }
+
+    public ZonedDateTime getDeleteDateTime() {
+        return deleteDateTime;
     }
 
     public void setDeleteDateTime(ZonedDateTime deleteDateTime) {
         this.deleteDateTime = deleteDateTime;
     }
 
+    public PostEntity getPost() {
+        return post;
+    }
+
+    public void setPost(PostEntity post) {
+        this.post = post;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
     public void setUser(UserEntity user) {
         this.user = user;
-    }
-
-    public Long getRepliesCount() {
-        return repliesCount;
-    }
-
-    public void setRepliesCount(Long repliesCount) {
-        this.repliesCount = repliesCount;
     }
 
     @PrePersist
@@ -113,25 +115,26 @@ public class PostEntity {
         this.updateDateTime = ZonedDateTime.now();
     }
 
-    public static PostEntity of(String body, UserEntity user){
-        var post = new PostEntity();
-        post.setBody(body);
-        post.setUser(user);
-        
-        return post;
+    public static ReplyEntity of(String body, UserEntity user, PostEntity post){
+        var reply = new ReplyEntity();
+        reply.setBody(body);
+        reply.setUser(user);
+        reply.setPost(post);
+
+        return reply;
     }
+
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((postId == null) ? 0 : postId.hashCode());
+        result = prime * result + ((replyId == null) ? 0 : replyId.hashCode());
         result = prime * result + ((body == null) ? 0 : body.hashCode());
-        result = prime * result + ((repliesCount == null) ? 0 : repliesCount.hashCode());
         result = prime * result + ((createdDateTime == null) ? 0 : createdDateTime.hashCode());
         result = prime * result + ((updateDateTime == null) ? 0 : updateDateTime.hashCode());
         result = prime * result + ((deleteDateTime == null) ? 0 : deleteDateTime.hashCode());
-        result = prime * result + ((user == null) ? 0 : user.hashCode());
+        result = prime * result + ((post == null) ? 0 : post.hashCode());
         return result;
     }
 
@@ -143,21 +146,16 @@ public class PostEntity {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        PostEntity other = (PostEntity) obj;
-        if (postId == null) {
-            if (other.postId != null)
+        ReplyEntity other = (ReplyEntity) obj;
+        if (replyId == null) {
+            if (other.replyId != null)
                 return false;
-        } else if (!postId.equals(other.postId))
+        } else if (!replyId.equals(other.replyId))
             return false;
         if (body == null) {
             if (other.body != null)
                 return false;
         } else if (!body.equals(other.body))
-            return false;
-        if (repliesCount == null) {
-            if (other.repliesCount != null)
-                return false;
-        } else if (!repliesCount.equals(other.repliesCount))
             return false;
         if (createdDateTime == null) {
             if (other.createdDateTime != null)
@@ -174,17 +172,17 @@ public class PostEntity {
                 return false;
         } else if (!deleteDateTime.equals(other.deleteDateTime))
             return false;
-        if (user == null) {
-            if (other.user != null)
+        if (post == null) {
+            if (other.post != null)
                 return false;
-        } else if (!user.equals(other.user))
+        } else if (!post.equals(other.post))
             return false;
         return true;
     }
 
+ 
 
     
-   
 
    
 
