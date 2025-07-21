@@ -35,6 +35,8 @@ public class PostEntity {
     private Long repliesCount = 0L;
 
     @Column
+    private Long likesCount = 0L;
+    @Column
     private ZonedDateTime createdDateTime;
     
     @Column
@@ -101,6 +103,13 @@ public class PostEntity {
     public void setRepliesCount(Long repliesCount) {
         this.repliesCount = repliesCount;
     }
+    public Long getLikesCount() {
+        return likesCount;
+    }
+
+    public void setLikesCount(Long likesCount) {
+        this.likesCount = likesCount;
+    }
 
     @PrePersist
     private void prePersist(){
@@ -128,6 +137,7 @@ public class PostEntity {
         result = prime * result + ((postId == null) ? 0 : postId.hashCode());
         result = prime * result + ((body == null) ? 0 : body.hashCode());
         result = prime * result + ((repliesCount == null) ? 0 : repliesCount.hashCode());
+        result = prime * result + ((likesCount == null) ? 0 : likesCount.hashCode());
         result = prime * result + ((createdDateTime == null) ? 0 : createdDateTime.hashCode());
         result = prime * result + ((updateDateTime == null) ? 0 : updateDateTime.hashCode());
         result = prime * result + ((deleteDateTime == null) ? 0 : deleteDateTime.hashCode());
@@ -159,6 +169,11 @@ public class PostEntity {
                 return false;
         } else if (!repliesCount.equals(other.repliesCount))
             return false;
+        if (likesCount == null) {
+            if (other.likesCount != null)
+                return false;
+        } else if (!likesCount.equals(other.likesCount))
+            return false;
         if (createdDateTime == null) {
             if (other.createdDateTime != null)
                 return false;
@@ -181,13 +196,5 @@ public class PostEntity {
             return false;
         return true;
     }
-
-
-    
-   
-
-   
-
-
     
 }

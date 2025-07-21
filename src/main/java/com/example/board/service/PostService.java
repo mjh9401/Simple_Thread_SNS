@@ -4,15 +4,18 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.board.exception.post.PostNotFoundException;
 import com.example.board.exception.user.UserNotAllowedException;
 import com.example.board.exception.user.UserNotFoundException;
+import com.example.board.model.entity.LikeEntity;
 import com.example.board.model.entity.PostEntity;
 import com.example.board.model.entity.UserEntity;
 import com.example.board.model.post.Post;
 import com.example.board.model.post.PostPatchRequestBody;
 import com.example.board.model.post.PostPostRequestBody;
+import com.example.board.repository.LikeEntityRepository;
 import com.example.board.repository.PostEntityRepository;
 import com.example.board.repository.UserEntityRepository;
 
@@ -23,7 +26,8 @@ public class PostService {
     private PostEntityRepository postEntityRepository;
     @Autowired
     private UserEntityRepository userEntityRepository;
-
+    @Autowired
+    private LikeEntityRepository likeEntityRepository;
 
     public List<Post> getPosts(){
         var postEntities = postEntityRepository.findAll();
@@ -75,6 +79,23 @@ public class PostService {
         var postEntities= postEntityRepository.findByUser(userEntity);
     
         return postEntities.stream().map(Post::from).toList();
+    }
+
+    @Transactional
+    public Post toggleLike(Long postId, UserEntity currentUser) {
+        var postEntity = postEntityRepository.findById(postId)
+                            .orElseThrow(() -> new PostNotFoundException(postId));
+        var likeEntity = likeEntityRepository.findByUserAndPost(currentUser, postEntity);
+
+        if(likeEntity.isPresent()){
+            likeEntityRepository.delete(likeEntity.get());
+            postEntity.setLikesCount(Math.max(0, postEntity.getLikesCount() - 1));
+        }else{
+            likeEntityRepository.save(LikeEntity.of(currentUser, postEntity));
+            postEntity.setLikesCount(postEntity.getLikesCount() + 1);
+        }
+
+        return Post.from(postEntityRepository.save(postEntity));
     }   
 
 
