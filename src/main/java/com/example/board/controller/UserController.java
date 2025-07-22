@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,6 +65,34 @@ public class UserController {
         var posts = postService.getPostByUsername(username);
        
         return ResponseEntity.ok(posts); 
+    }
+
+    @PostMapping("/{username}/follows")
+    public ResponseEntity<User> follow(@PathVariable("username") String username, Authentication authentication) {
+        var user = userService.follow(username, (UserEntity)authentication.getPrincipal());
+
+        return ResponseEntity.ok(user); 
+    }
+
+    @DeleteMapping("/{username}/follows")
+    public ResponseEntity<User> unfollow(@PathVariable("username") String username, Authentication authentication) {
+        var user = userService.unfollow(username, (UserEntity)authentication.getPrincipal());
+
+        return ResponseEntity.ok(user); 
+    }
+
+    @GetMapping("/{username}/followers")
+    public ResponseEntity<List<User>> getFollowerByUser(@PathVariable("username") String username) {
+        var followers = userService.getFollowersByUsername(username);
+
+        return ResponseEntity.ok(followers); 
+    }
+
+    @GetMapping("/{username}/followings")
+    public ResponseEntity<List<User>> getFollowingsByUser(@PathVariable("username") String username) {
+        var followings = userService.getFollowingsByUsername(username);
+
+        return ResponseEntity.ok(followings); 
     }
 
     @PostMapping

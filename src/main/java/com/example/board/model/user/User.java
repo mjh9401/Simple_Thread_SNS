@@ -5,7 +5,7 @@ import java.time.ZonedDateTime;
 import com.example.board.model.entity.UserEntity;
 
 public record User(Long userId, String username, String profile, 
-                    String description, ZonedDateTime createdDatetime, ZonedDateTime updatedDatetime) {
+                    String description,Long followersCount, Long follwingsCount, ZonedDateTime createdDatetime, ZonedDateTime updatedDatetime) {
 
     public static User from(UserEntity userEntity){
         return new User(
@@ -13,6 +13,8 @@ public record User(Long userId, String username, String profile,
             userEntity.getUsername(),
             userEntity.getProfile(),
             userEntity.getDescription(),
+            userEntity.getFollowersCount(),
+            userEntity.getFollwingsCount(),
             userEntity.getCreatedDatetime(),
             userEntity.getUpdatedDatetime()
         );

@@ -44,6 +44,12 @@ public class UserEntity implements UserDetails{
     private String description;
 
     @Column
+    private Long followersCount = 0L;
+
+    @Column
+    private Long follwingsCount = 0L;
+
+    @Column
     private ZonedDateTime createdDatetime;
 
     @Column
@@ -124,6 +130,21 @@ public class UserEntity implements UserDetails{
         this.deleteddatetime = deleteddatetime;
     }
 
+    public Long getFollowersCount() {
+        return followersCount;
+    }
+
+    public void setFollowersCount(Long followersCount) {
+        this.followersCount = followersCount;
+    }
+
+    public Long getFollwingsCount() {
+        return follwingsCount;
+    }
+
+    public void setFollwingsCount(Long follwingsCount) {
+        this.follwingsCount = follwingsCount;
+    }
     
 
     public static UserEntity of(String username, String password){
@@ -157,6 +178,8 @@ public class UserEntity implements UserDetails{
         result = prime * result + ((password == null) ? 0 : password.hashCode());
         result = prime * result + ((profile == null) ? 0 : profile.hashCode());
         result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + ((followersCount == null) ? 0 : followersCount.hashCode());
+        result = prime * result + ((follwingsCount == null) ? 0 : follwingsCount.hashCode());
         result = prime * result + ((createdDatetime == null) ? 0 : createdDatetime.hashCode());
         result = prime * result + ((updatedDatetime == null) ? 0 : updatedDatetime.hashCode());
         result = prime * result + ((deleteddatetime == null) ? 0 : deleteddatetime.hashCode());
@@ -197,6 +220,16 @@ public class UserEntity implements UserDetails{
                 return false;
         } else if (!description.equals(other.description))
             return false;
+        if (followersCount == null) {
+            if (other.followersCount != null)
+                return false;
+        } else if (!followersCount.equals(other.followersCount))
+            return false;
+        if (follwingsCount == null) {
+            if (other.follwingsCount != null)
+                return false;
+        } else if (!follwingsCount.equals(other.follwingsCount))
+            return false;
         if (createdDatetime == null) {
             if (other.createdDatetime != null)
                 return false;
@@ -215,7 +248,7 @@ public class UserEntity implements UserDetails{
         return true;
     }
 
-   
+
 
     
 }
