@@ -39,15 +39,15 @@ public class UserController {
     private PostService postService;
 
     @GetMapping
-    public ResponseEntity<List<User>> getUsers(@RequestParam(required = false, name = "query") String query) {
-        var users = userService.getUsers(query);
+    public ResponseEntity<List<User>> getUsers(@RequestParam(required = false, name = "query") String query, Authentication authentication) {
+        var users = userService.getUsers(query, (UserEntity)authentication.getPrincipal());
 
         return ResponseEntity.ok(users); 
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<User> getUser(@PathVariable("username") String username) {
-        var user = userService.getUser(username);
+    public ResponseEntity<User> getUser(@PathVariable("username") String username, Authentication authentication) {
+        var user = userService.getUser(username, (UserEntity)authentication.getPrincipal());
 
         return ResponseEntity.ok(user); 
     }
@@ -82,15 +82,15 @@ public class UserController {
     }
 
     @GetMapping("/{username}/followers")
-    public ResponseEntity<List<User>> getFollowerByUser(@PathVariable("username") String username) {
-        var followers = userService.getFollowersByUsername(username);
+    public ResponseEntity<List<User>> getFollowerByUser(@PathVariable("username") String username, Authentication authentication) {
+        var followers = userService.getFollowersByUsername(username, (UserEntity)authentication.getPrincipal());
 
         return ResponseEntity.ok(followers); 
     }
 
     @GetMapping("/{username}/followings")
-    public ResponseEntity<List<User>> getFollowingsByUser(@PathVariable("username") String username) {
-        var followings = userService.getFollowingsByUsername(username);
+    public ResponseEntity<List<User>> getFollowingsByUser(@PathVariable("username") String username, Authentication authentication) {
+        var followings = userService.getFollowingsByUsername(username, (UserEntity)authentication.getPrincipal());
 
         return ResponseEntity.ok(followings); 
     }
