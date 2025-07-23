@@ -13,15 +13,22 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.board.exception.follow.FollowAlreadyExistsException;
 import com.example.board.exception.follow.FollowNotFoundException;
 import com.example.board.exception.follow.InvalidFollowException;
+import com.example.board.exception.post.PostNotFoundException;
 import com.example.board.exception.user.UserAlreadyExistsException;
 import com.example.board.exception.user.UserNotAllowedException;
 import com.example.board.exception.user.UserNotFoundException;
 import com.example.board.model.entity.FollowEntity;
+import com.example.board.model.entity.LikeEntity;
+import com.example.board.model.entity.PostEntity;
 import com.example.board.model.entity.UserEntity;
+import com.example.board.model.user.Follower;
+import com.example.board.model.user.LikedUser;
 import com.example.board.model.user.User;
 import com.example.board.model.user.UserAuthenticationResponse;
 import com.example.board.model.user.UserPatchRequestBody;
 import com.example.board.repository.FollowEntityRepository;
+import com.example.board.repository.LikeEntityRepository;
+import com.example.board.repository.PostEntityRepository;
 import com.example.board.repository.UserEntityRepository;
 
 @Service
@@ -31,6 +38,10 @@ public class UserService implements UserDetailsService{
     private UserEntityRepository userEntityRepository;
     @Autowired
     private FollowEntityRepository followEntityRepository;
+    @Autowired
+    private PostEntityRepository postEntityRepository;
+    @Autowired
+    private LikeEntityRepository likeEntityRepository;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
     @Autowired
@@ -161,13 +172,16 @@ public class UserService implements UserDetailsService{
         return User.from(following,false);
     }
 
-    public List<User> getFollowersByUsername(String username, UserEntity currentUser) {
+    public List<Follower> getFollowersByUsername(String username, UserEntity currentUser) {
         var following = userEntityRepository.findByUsername(username)
                         .orElseThrow(()-> new UserNotFoundException(username));
         
         var followEntity = followEntityRepository.findByFollowing(following);
         
-        return followEntity.stream().map(follow -> getUserWithFollowingsStatus(follow.getFollower(), currentUser)).toList();
+        return followEntity.stream()
+            .map(follow -> Follower.from(
+                getUserWithFollowingsStatus(follow.getFollower(), currentUser), follow.getCreatedDateTime())
+            ).toList();
     }
 
     public List<User> getFollowingsByUsername(String username, UserEntity currentUser) {
@@ -178,6 +192,36 @@ public class UserService implements UserDetailsService{
 
         return followEntity.stream().map(follow -> getUserWithFollowingsStatus(follow.getFollowing(), currentUser)).toList();
     }
+
+    public List<LikedUser> getLikedUsersByPostId(Long postId, UserEntity currentUser) {
+        var postEntity = postEntityRepository.findById(postId)
+                            .orElseThrow(() -> new PostNotFoundException(postId));
+        var likeEntites = likeEntityRepository.findByPost(postEntity);
+
+        return likeEntites.stream().map(likeEntity->getLikedUserWithFollowingsStatus(likeEntity, postEntity, currentUser)).toList();
+    }
+
+    public List<LikedUser> getLikedUsersByUser(String username, UserEntity currentUser) {
+        var userEntity = userEntityRepository.findByUsername(username)
+                        .orElseThrow(()-> new UserNotFoundException(username));
+
+        var postEntities = postEntityRepository.findByUser(userEntity);
+        
+        return postEntities.stream().flatMap(
+            postEntity->likeEntityRepository.findByPost(postEntity).stream().map(likeEntity->getLikedUserWithFollowingsStatus(likeEntity, postEntity, currentUser))
+        ).toList();
+    }
+
+   
+
+    private LikedUser getLikedUserWithFollowingsStatus(LikeEntity likeEntity, PostEntity postEntity, UserEntity currentUser){
+        var likedUserEntity = likeEntity.getUser();
+        var userWithFollowingStatus = getUserWithFollowingsStatus(likedUserEntity, currentUser);
+            
+        return LikedUser.from(userWithFollowingStatus,postEntity.getPostId() , likeEntity.getCreatedDateTime());
+    }
+
+   
 
     
 

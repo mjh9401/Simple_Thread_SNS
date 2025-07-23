@@ -21,7 +21,9 @@ import com.example.board.model.entity.UserEntity;
 import com.example.board.model.post.Post;
 import com.example.board.model.post.PostPatchRequestBody;
 import com.example.board.model.post.PostPostRequestBody;
+import com.example.board.model.user.LikedUser;
 import com.example.board.service.PostService;
+import com.example.board.service.UserService;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -31,6 +33,8 @@ public class PostController {
 
     @Autowired
     private PostService postService;
+    @Autowired
+    private UserService userService;
     
     @GetMapping
     public ResponseEntity<List<Post>> getPosts(Authentication authentication){
@@ -44,6 +48,13 @@ public class PostController {
         Post machingPost = postService.getPostByPostId(postId,(UserEntity) authentication.getPrincipal());
 
         return ResponseEntity.ok(machingPost);
+    }
+
+    @GetMapping("/{postId}/liked-users")
+    public ResponseEntity<List<LikedUser>> getLikedUsersByPostId(@PathVariable("postId") Long postId, Authentication authentication){
+        var likedUsers =userService.getLikedUsersByPostId(postId,(UserEntity) authentication.getPrincipal());
+        
+        return ResponseEntity.ok(likedUsers);
     }
 
     

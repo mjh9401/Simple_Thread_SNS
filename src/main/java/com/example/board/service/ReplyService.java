@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.board.exception.post.PostNotFoundException;
 import com.example.board.exception.reply.ReplyNotFoundException;
 import com.example.board.exception.user.UserNotAllowedException;
+import com.example.board.exception.user.UserNotFoundException;
 import com.example.board.model.entity.ReplyEntity;
 import com.example.board.model.entity.UserEntity;
 import com.example.board.model.reply.Reply;
@@ -74,6 +75,13 @@ public class ReplyService {
         replyEntityRepository.delete(replyEntity);
         postEntity.setRepliesCount(Math.max(0, postEntity.getRepliesCount() - 1));
         postEntityRepository.save(postEntity);
+    }
+
+    public List<Reply> getRepliesByUser(String username) {
+        var userEntity = userEntityRepository.findByUsername(username)
+                            .orElseThrow(()-> new UserNotFoundException(username));
+        var replyEntities = replyEntityRepository.findByUser(userEntity);
+        return replyEntities.stream().map(Reply::from).toList();
     }   
 
 }
