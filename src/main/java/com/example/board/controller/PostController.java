@@ -2,6 +2,7 @@ package com.example.board.controller;
 
 import java.util.List;
 
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,15 +33,15 @@ public class PostController {
     private PostService postService;
     
     @GetMapping
-    public ResponseEntity<List<Post>> getPosts(){
-        var posts = postService.getPosts();
+    public ResponseEntity<List<Post>> getPosts(Authentication authentication){
+        var posts = postService.getPosts((UserEntity) authentication.getPrincipal());
 
         return ResponseEntity.ok(posts);
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<Post> getPostByPostId(@PathVariable("postId") Long postId){
-        Post machingPost = postService.getPostByPostId(postId);
+    public ResponseEntity<Post> getPostByPostId(@PathVariable("postId") Long postId, Authentication authentication){
+        Post machingPost = postService.getPostByPostId(postId,(UserEntity) authentication.getPrincipal());
 
         return ResponseEntity.ok(machingPost);
     }
